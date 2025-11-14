@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"database/sql"
+	"errors"
 	"fmt"
 	"rest-service/internal/storage"
 
@@ -63,4 +64,48 @@ func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 
 	// Возвращаем ID
 	return id, nil
+}
+
+func (s *Storage) GetURL(alias string) (string, error) {
+	const op = "storage.sqlite.GetURL"
+
+	stmt, err := s.db.Prepare("SELECT url FROM url WHERE alias = ?")
+	if err != nil {
+		return "", fmt.Errorf("%s: prepare statement: %w", op, err)
+	}
+
+	var resURL string
+
+	err = stmt.QueryRow(alias).Scan(&resURL)
+	if errors.Is(err, sql.ErrNoRows) {
+		return "", storage.ErrURLNotfound
+	}
+	if err != nil {
+		return "", fmt.Errorf("%s: execute statement: %w", op, err)
+	}
+
+	return resURL, nil
+}
+
+func (s *Storage) DeleteURL(alias string) error {
+	const op = "storage.sqlte.DeleteURL"
+	stmt, err := s.db.Prepare("DELETE FROM url WHERE alias = ?")
+	if err != nil {
+		return fmt.Errorf("%s: execute statement: %w", op, err)
+	}
+	defer stmt.Close()
+
+	res, err := stmt.Exec(alias)
+	if err != nil {
+		return fmt.Errorf("%s: execute statement: %w", op, err)
+	}
+	rows, err := res.RowsAffected()
+	if err != nil {
+		return fmt.Errorf("%s: execute statement: %w", op, err)
+	}
+	if rows == 0 {
+		return storage.ErrURLNotfound
+	}
+	return nil
+
 }
