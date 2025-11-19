@@ -13,8 +13,13 @@ type DiscardHandler struct{}
 
 func NewDiscardHandler() *DiscardHandler {
 	return &DiscardHandler{}
+<<<<<<< HEAD
 
 }
+=======
+}
+
+>>>>>>> 5ab71d5a7dd844656f6f44610dd94b3860f24d70
 func (h *DiscardHandler) Handle(_ context.Context, _ slog.Record) error {
 	// Просто игнорируем запись журнала
 	return nil

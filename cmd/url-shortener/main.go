@@ -5,6 +5,7 @@ import (
 	"log/slog"
 	"os"
 	"rest-service/internal/config"
+	"rest-service/internal/http-server/middleware/logger"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -33,6 +34,7 @@ func main() {
 	router.Use(middleware.Logger)
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
+	router.Use(logger.New(log))
 
 }
 
