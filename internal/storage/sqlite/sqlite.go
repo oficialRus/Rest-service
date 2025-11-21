@@ -5,8 +5,6 @@ import (
 	"errors"
 	"fmt"
 	"rest-service/internal/storage"
-
-	"github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {
@@ -49,9 +47,9 @@ func (s *Storage) SaveURL(urlToSave string, alias string) (int64, error) {
 
 	res, err := stmt.Exec(urlToSave, alias)
 	if err != nil {
-		if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
-			return 0, fmt.Errorf("%s: %w", op, storage.ErrURLExists)
-		}
+		// if sqliteErr, ok := err.(sqlite3.Error); ok && sqliteErr.ExtendedCode == sqlite3.ErrConstraintUnique {
+		// 	return 0, fmt.Errorf("%s: %w", op, storage.ErrURLExists)
+		// }
 
 		return 0, fmt.Errorf("%s: execute statement: %w", op, err)
 	}
@@ -78,7 +76,7 @@ func (s *Storage) GetURL(alias string) (string, error) {
 
 	err = stmt.QueryRow(alias).Scan(&resURL)
 	if errors.Is(err, sql.ErrNoRows) {
-		return "", storage.ErrURLNotfound
+		return "", storage.ErrURLNotFound
 	}
 	if err != nil {
 		return "", fmt.Errorf("%s: execute statement: %w", op, err)
@@ -104,7 +102,7 @@ func (s *Storage) DeleteURL(alias string) error {
 		return fmt.Errorf("%s: execute statement: %w", op, err)
 	}
 	if rows == 0 {
-		return storage.ErrURLNotfound
+		return storage.ErrURLNotFound
 	}
 	return nil
 
