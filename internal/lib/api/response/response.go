@@ -1,11 +1,24 @@
 package response
 
-type Response struct {
-	Status string
-	Error  string
+type Respone struct {
+	Status string `json:"status"`
+	Error  string `json:"error,omitempty"`
 }
 
 const (
-	StatusOk    = "OK"
+	StatusOK    = "OK"
 	StatusError = "Error"
 )
+
+func Error(msg string) Respone {
+	return Respone{
+		Status: StatusError,
+		Error:  msg,
+	}
+}
+
+func OK() Respone {
+	return Respone{
+		Status: StatusOK,
+	}
+}
