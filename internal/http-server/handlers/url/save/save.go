@@ -18,7 +18,7 @@ type Request struct {
 	Alias string `json:"alias,omitempty"`
 }
 type Response struct {
-	resp.Respone
+	resp.Response
 	Alias string `json:"alias,omitempty"`
 }
 
@@ -41,6 +41,12 @@ func New(log *slog.Logger, s URLSaver) http.HandlerFunc {
 			return
 
 		}
+
+		if err != nil {
+			log.Error("failed to decode request body", sl.Err(err))
+			render.JSON(w, r, resp.Error("failed to decode request"))
+			return
+		}
 		log.Info("request body decode ", slog.Any("req", req))
 		if err := validator.New().Struct(req); err != nil {
 			// Приводим ошибку к типу ошибки валидации
@@ -48,7 +54,7 @@ func New(log *slog.Logger, s URLSaver) http.HandlerFunc {
 
 			log.Error("invalid request", sl.Err(err))
 
-			render.JSON(w, r, resp.Error(validateErr.Error()))
+			render.JSON(w, r, resp.ValidationError(validateErr))
 
 			return
 		}
