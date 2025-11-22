@@ -7,11 +7,14 @@ import (
 	"net/http"
 	resp "rest-service/internal/lib/api/response"
 	"rest-service/internal/lib/logger/sl"
+	random "rest-service/internal/lib/random"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
 	"github.com/go-playground/validator"
 )
+
+const aliasLength = 6
 
 type Request struct {
 	URL   string `json:"url" validate:"required,url"`
@@ -57,6 +60,11 @@ func New(log *slog.Logger, s URLSaver) http.HandlerFunc {
 			render.JSON(w, r, resp.ValidationError(validateErr))
 
 			return
+		}
+
+		alias := req.Alias
+		if alias == "" {
+			alias = random.NewRandomString(aliasLength)
 		}
 
 	}
