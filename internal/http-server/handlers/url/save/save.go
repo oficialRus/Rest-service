@@ -8,6 +8,7 @@ import (
 	resp "rest-service/internal/lib/api/response"
 	"rest-service/internal/lib/logger/sl"
 	random "rest-service/internal/lib/random"
+	"rest-service/internal/storage"
 
 	"github.com/go-chi/chi/v5/middleware"
 	"github.com/go-chi/render"
@@ -25,6 +26,7 @@ type Response struct {
 	Alias string `json:"alias,omitempty"`
 }
 
+//go:generate go run github.com/vektra/mockery/v2@v2.28.2 --name=URLSaver
 type URLSaver interface {
 	SaveURL(URL, alias string) (int64, error)
 }
@@ -66,6 +68,23 @@ func New(log *slog.Logger, s URLSaver) http.HandlerFunc {
 		if alias == "" {
 			alias = random.NewRandomString(aliasLength)
 		}
+		id, err := s.SaveURL(req.URL, alias)
+		if errors.Is(err, storage.ErrURLExists) {
+			log.Info("url alredy exists", slog.String("url", req.URL))
+			render.JSON(w, r, resp.Error("failed to add url"))
+			return
+		}
+		log.Info("url added", slog.Int64("id", id))
+		responseOK(w, r, alias)
 
 	}
+
+}
+
+func responseOK(w http.ResponseWriter, r *http.Request, alias string) {
+	render.JSON(w, r, Response{
+		Response: resp.OK(),
+		Alias:    alias,
+	})
+
 }

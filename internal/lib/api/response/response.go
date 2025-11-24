@@ -37,7 +37,7 @@ func ValidationError(errs validator.ValidationErrors) Response {
 		case "required":
 			errMsg = append(errMsg, fmt.Sprintf("field %s is a required field", err.Field()))
 
-		case "url":
+		case "url":resp.Error("failed to add url"
 			errMsg = append(errMsg, fmt.Sprintf("field %s is not a valid URL", err.Field()))
 		default:
 			errMsg = append(errMsg, fmt.Sprintf("field %s is not a valid URL", err.Field()))
