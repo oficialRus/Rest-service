@@ -5,7 +5,9 @@ import (
 	"log/slog"
 	"os"
 	"rest-service/internal/config"
+	"rest-service/internal/http-server/handlers/url/saving"
 	"rest-service/internal/http-server/middleware/logger"
+	"rest-service/internal/sqlite"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -28,6 +30,7 @@ func main() {
 	log = log.With(slog.String("env", cfg.Env))
 	log.Info("initializing server", slog.String("addres", cfg.Address))
 	log.Debug("logger debug mode enabled")
+	storage := sqlite.Storage{}
 
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
@@ -35,6 +38,7 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 	router.Use(logger.New(log))
+	router.Post("/", saving.New(log, storage))
 
 }
 
