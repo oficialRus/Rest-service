@@ -30,7 +30,10 @@ func main() {
 	log = log.With(slog.String("env", cfg.Env))
 	log.Info("initializing server", slog.String("addres", cfg.Address))
 	log.Debug("logger debug mode enabled")
-	storage := sqlite.Storage{}
+	storage, err := sqlite.New(cfg.StoragePath)
+	if err != nil {
+		log.Error("failed to init storage", slog.Any("err", err))
+	}
 
 	router := chi.NewRouter()
 	router.Use(middleware.RequestID)
