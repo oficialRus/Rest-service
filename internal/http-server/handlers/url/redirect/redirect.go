@@ -1,9 +1,12 @@
 package redirect
 
 import (
+	"errors"
 	"log/slog"
 	"net/http"
 	"rest-service/internal/lib/api/response"
+	"rest-service/internal/lib/logger/sl"
+	"rest-service/internal/storage"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -27,6 +30,20 @@ func New(log *slog.Logger, urlGETTER URLGetter) http.HandlerFunc {
 			render.JSON(w, r, response.Error("not found"))
 			return
 		}
+		resURL, err := urlGETTER.GetURL(alias)
+		if errors.Is(err, storage.ErrURLNotFound) {
+			log.Info("url not found", "alias", alias)
+			render.JSON(w, r, response.Error("internal error"))
+			return
+		}
+
+		if err != nil {
+			log.Error("failed to get url", sl.Err(err))
+			render.JSON(w, r, response.Error("internal error"))
+		}
+		log.Info("got url", slog.String("url", resURL))
+
+		http.Redirect(w, r, resURL, http.StatusFound)
 
 	}
 

@@ -5,9 +5,12 @@ import (
 	"log/slog"
 	"os"
 	"rest-service/internal/config"
+	"rest-service/internal/http-server/handlers/url/redirect"
 	"rest-service/internal/http-server/handlers/url/saving"
 	"rest-service/internal/http-server/middleware/logger"
 	"rest-service/internal/sqlite"
+
+	_ "rest-service/internal/storage/sqlite"
 
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
@@ -33,6 +36,7 @@ func main() {
 	storage, err := sqlite.New(cfg.StoragePath)
 	if err != nil {
 		log.Error("failed to init storage", slog.Any("err", err))
+		return
 	}
 
 	router := chi.NewRouter()
@@ -42,7 +46,7 @@ func main() {
 	router.Use(middleware.URLFormat)
 	router.Use(logger.New(log))
 	router.Post("/", saving.New(log, storage))
-
+	router.Get("/{alias}", redirect.New(log, storage))
 }
 
 func setupLogger(env string) *slog.Logger {
