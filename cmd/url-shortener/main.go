@@ -46,7 +46,7 @@ func main() {
 	router.Use(logger.New(log))
 	router.Post("/", saving.New(log, storage))
 	router.Get("/{alias}", redirect.New(log, storage))
-	router.Delete("/{alias}", remove.New(log, storage))
+	router.Delete("//{alias}", remove.New(log, storage))
 
 }
 
