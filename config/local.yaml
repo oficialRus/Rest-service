@@ -3,4 +3,4 @@ storage_path: "../../internal/storage/storage.db" # файл, в котором 
 http_server: # конфигурация нашего http-сервера
   address: "localhost:8082"
   timeout: 4s
-  idle_timeout: 30sё
+  idle_timeout: 30s
