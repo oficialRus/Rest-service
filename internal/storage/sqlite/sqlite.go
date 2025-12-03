@@ -5,6 +5,8 @@ import (
 	"errors"
 	"fmt"
 	"rest-service/internal/storage"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type Storage struct {

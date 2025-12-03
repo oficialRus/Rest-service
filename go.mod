@@ -10,6 +10,7 @@ require (
 	github.com/go-playground/validator v9.31.0+incompatible
 	github.com/ilyakaznacheev/cleanenv v1.5.0
 	github.com/joho/godotenv v1.5.1
+	github.com/mattn/go-sqlite3 v1.14.32
 	github.com/stretchr/testify v1.8.4
 )
 
