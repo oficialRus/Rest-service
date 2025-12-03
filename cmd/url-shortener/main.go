@@ -44,6 +44,9 @@ func main() {
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.URLFormat)
 	router.Use(logger.New(log))
+	router.Route("/url", func(r chi.Router) {
+		r.Use(middleware.BasicAuth())
+	})
 	router.Post("/", saving.New(log, storage))
 	router.Get("/{alias}", redirect.New(log, storage))
 	router.Delete("/{alias}", remove.New(log, storage))
